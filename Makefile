@@ -1,2 +1,5 @@
 clean:
-	rm -R *.pyc
+	rm model/*.pyc
+	rm recorder/*.pyc
+	rm sover/*.pyc
+	
