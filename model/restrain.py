@@ -36,23 +36,24 @@ import numpy as np
 
 class Restrain:
     def __init__(self):
-        self.list = np.array([[]])
+        self.list = np.array([])
         pass
-    def addRestrain(self, node, restrain):
+    def addRestrain(self, node, restrain, dimension=2):
         ''' Add restrain to structure
             d.. = translation 
             r.. = rotation
         '''
+        a = dimension*node
         if restrain == 'fixed':
-            dx, dy, dz = 1, 1, 1
+            restrained = [a-dimension, a-dimension+1, a-dimension+2]
         elif restrain == 'pin':
-            dx, dy, dz = 1, 1, 0
+            restrained = [a-dimension, a-dimension+1]
         elif restrain == 'roller':
-            dx, dy, dz = 0, 1, 0
+            restrained = [a-dimension+1]
         else:
             return
         if self.list.size == 0:
-            self.list = np.array([[node, dx, dy, dz]])
+            self.list = np.array(restrained)
         else:
-            self.list = np.append(self.list, [[node, dx, dy, dz]], axis=0)
+            self.list = np.append(self.list, restrained, axis=0)
         
