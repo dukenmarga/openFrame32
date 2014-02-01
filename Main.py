@@ -37,6 +37,7 @@ from model.material import Material
 from model.section import Section
 from model.node import Node
 from model.load import Load
+from model.restrain import Restrain
 from solver.truss import Truss
 
 '''
@@ -72,8 +73,13 @@ structure.AddElement((2, 3), section=2) # node 2 + node 3 using section 2
 load = Load()
 load.addLoad(1, Fx=200) # load 1 at node 2
 
+# Define restrain.
+restrain = Restrain()
+restrain.addRestrain(1, 'pin') # node 1 is pin
+restrain.addRestrain(3, 'roller') # node 3 is roller
+
 truss = Truss()
-truss.solve2d(node, material, section, structure, load)
+truss.solve2d(node, material, section, structure, load, restrain)
 #print "Trigonometri: "
 #print truss.dataTrigonometri
 #print ""

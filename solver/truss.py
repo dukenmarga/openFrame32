@@ -43,7 +43,7 @@ class Truss():
         self.globalStiffnessMatrix = np.array([[]])
         self.loadMatrix = np.array([])
         pass
-    def solve2d(self, node, material, section, structure, load):
+    def solve2d(self, node, material, section, structure, load, restrain):
         self.DOF = 2
         self.assembleTrigonometri(structure, node)
         self.assembleLocalStiffness(structure, section)
