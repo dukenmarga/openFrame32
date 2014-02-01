@@ -41,12 +41,14 @@ class Truss():
         self.dataTrigonometri = np.array([[]])
         self.localStiffnessMatrix = np.array([[[]]])
         self.globalStiffnessMatrix = np.array([[]])
+        self.loadMatrix = np.array([])
         pass
     def solve2d(self, node, material, section, structure, load):
         self.DOF = 2
         self.assembleTrigonometri(structure, node)
         self.assembleLocalStiffness(structure, section)
         self.assembleGlobalStiffness(structure, node)
+        self.assembleLoad(load, node)
         pass
     def assembleTrigonometri(self, structure, node):
         '''
@@ -94,13 +96,13 @@ class Truss():
         pass
     def assembleLocalStiffness(self, structure, section):
         i = 0
+        indexArea = 0
+        indexSecondInertia = 1
+        indexLength = 3
         for element in structure.list:
             # n1 & n2 are number of nodes for each element
             n1, n2 = element[0]-1, element[1]-1
             numberSection = element[2]-1
-            indexArea = 0
-            indexSecondInertia = 1
-            indexLength = 3
             
             # B = A*E/L
             A = section.list[numberSection][indexArea]
@@ -143,3 +145,13 @@ class Truss():
             i = i+1
             pass
         pass
+    def assembleLoad(self, load, node):
+        size = np.size(node.list, 1) * 2 
+        self.loadMatrix = np.array(np.zeros((size,1)))
+        for load in load.list:
+            node = load[0]
+            Fx = load[1]
+            Fy = load[2]
+            self.loadMatrix[2*node-2:2*node] += [[Fx], [Fy]]
+        pass
+    
