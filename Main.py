@@ -70,7 +70,7 @@ structure.AddElement((2, 3), section=2) # node 2 + node 3 using section 2
 
 # Define load.
 load = Load()
-load.addLoad(2, (200, 0)) # load 1 at node 2
+load.addLoad(2, 200) # load 1 at node 2
 
 truss = Truss()
 truss.solve2d(node, material, section, structure, load)

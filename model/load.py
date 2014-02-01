@@ -38,9 +38,9 @@ class Load:
     def __init__(self):
         self.list = np.array([[]])
         pass
-    def addLoad(self, node, (Fx, Fy)):
+    def addLoad(self, node, Fx=0, Fy=0, Fz=0):
         if self.list.size == 0:
-            self.list = np.array([[node, Fx, Fy]])
+            self.list = np.array([[node, Fx, Fy, Fz]])
         else:
-            self.list = np.append(self.list, [[node, Fx, Fy]], axis=0)
+            self.list = np.append(self.list, [[node, Fx, Fy, Fz]], axis=0)
         pass
