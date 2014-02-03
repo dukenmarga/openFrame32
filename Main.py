@@ -39,7 +39,6 @@ from model.node import Node
 from model.load import Load
 from model.restrain import Restrain
 from solver.truss import Truss
-import numpy as np
 
 '''
     Node, element, material, load, and section numbering are using
@@ -49,7 +48,7 @@ import numpy as np
     Main program must be clear and readable and must not confuse people.
 '''
 
-# Define material property.
+# Define material's properties
 material = Material()
 material.addMaterial('concrete', F=30000000) #material 1 (not Zero)
 material.addMaterial('steel', F=400000000, Fu=600000000) #material 2

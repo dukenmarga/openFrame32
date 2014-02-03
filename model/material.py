@@ -36,17 +36,45 @@ import numpy as np
 import math
 
 class Material:
+    ''' Construct and define properties of
+        material.
+    '''
     def __init__(self):
-        #self.concrete = Concrete()
-        #self.steel = Steel()
         self.list = np.array([[]])
         pass
     def defineShearModulus(self, E, v):
         return E / (2*(1+v))
     
-    # F here means Fc for concrete or Fy for steel
-    # material: steel, concrete
     def addMaterial(self, material, F, Fu=0, E=0, v=0):
+        ''' Add material.
+
+        Parameters
+        ----------
+        material : {'concrete', 'steel'}
+            String contain material type (Default: 'steel')
+        F : float
+            Fc for concrete or Fy for steel. Default value for
+            concrete is `30 MPa` and `400 MPa` for steel.
+        Fu : float, optional
+            Ultimit strength of material
+            Default value is 1.1 times yield strength (F)
+        E : float, optional
+            Young modulus elasticity of material
+            Default value is :math:`4700*\\sqrt{F}` MPa for concrete
+            and :math:`200000` MPa for steel
+        v : float, optional
+            Poisson's ratio. Default is 0.17 for concrete and 0.3 for
+            steel material.
+
+        Example
+        -------
+        >>> material = Material()
+        >>> material.addMaterial('concrete', F=30000000) 
+        >>> material.addMaterial('steel', F=400000000, Fu=600000000)
+
+        '''
+        # indexMaterial is used to distinguish beetween material
+        # indexMaterial: 1 for concrete, 2 for steel
         if material == 'concrete':
             indexMaterial = 1
             v = 0.17
@@ -61,32 +89,3 @@ class Material:
             self.list = np.array([[indexMaterial, F, Fu, E, v]])
         else:
             self.list = np.append(self.list, [[indexMaterial, F, Fu, E, v]], axis=0)
-
-
-class Concrete(Material):
-    def __init__(self):
-        Material.__init__(self)
-        self.list = np.array([[]])
-        
-    def addConcrete(self, Fc, E, v=0.2):
-        '''Define concrete material
-            Fc = compressive concrete strength \
-            E = modulus elasticity\
-            v = Poison ratio
-            list = 2 dimension for holding material properties
-        '''
-        if self.list.size == 0:
-            self.list = np.array([[Fc, E, v]])
-        else:
-            self.list = np.append(self.list, [[Fc, E, v]], axis=0)
-            
-class Steel(Material):
-    def __init__(self):
-        Material.__init__(self)
-        self.list = np.array([[]])
-
-    def addSteel(self, Fy, Fu, E, v=0.3):
-        if self.list.size == 0:
-            self.list = np.array([[Fy, Fu, E, v]])
-        else:
-            self.list = np.append(self.list, [[Fy, Fu, E, v]], axis=0)
