@@ -39,6 +39,7 @@ from model.node import Node
 from model.load import Load
 from model.restrain import Restrain
 from solver.truss import Truss
+import numpy as np
 
 '''
     Node, element, material, load, and section numbering are using
@@ -50,42 +51,53 @@ from solver.truss import Truss
 
 # Define material property.
 material = Material()
-material.addMaterial('concrete', F=30) #material 1 (not Zero)
-material.addMaterial('steel', F=400, Fu=600) #material 2
+material.addMaterial('concrete', F=30000000) #material 1 (not Zero)
+material.addMaterial('steel', F=400000000, Fu=600000000) #material 2
 
 # Define section property.
 section = Section()
-section.AddSection(area=100, secondInertia=400, material=1) # section 1 using material 1
-section.AddSection(area=200, secondInertia=500, material=2) # section 2 using material 2
+section.AddSection(area=0.04, secondInertia=0.0001333, material=1) # section 1 using material 1
+section.AddSection(area=0.09, secondInertia=0.0006750, material=2) # section 2 using material 2
 
 # Define node.
 node = Node()
 node.addNode(0,0) # node 1
-node.addNode(5,5) # node 2
-node.addNode(10,0) # node 3
+#node.addNode(5,5) # node 2
+#node.addNode(10,0) # node 3
+node.addNode(10,0) # node 4
 
 # Define main structure.
 structure = Structure()
-structure.AddElement((1, 2), section=1) # node 1 + node 2 using section 1
-structure.AddElement((2, 3), section=2) # node 2 + node 3 using section 2
+structure.AddElement((1, 2), section=2) # node 1 + node 2 using section 1
+#structure.AddElement((2, 3), section=2) # node 2 + node 3 using section 2
+#structure.AddElement((2, 4), section=2)
 
 # Define load.
 load = Load()
-load.addLoad(1, Fx=200) # load 1 at node 2
+load.addLoad(2, Fx=10000) # load 1 at node 2 (Newton)
 
 # Define restrain.
 restrain = Restrain()
 restrain.addRestrain(1, 'pin') # node 1 is pin
-restrain.addRestrain(3, 'roller') # node 3 is roller
+restrain.addRestrain(2, 'roller') # node 3 is roller
+#restrain.addRestrain(4, 'pin') # node 4 is roller
 
 truss = Truss()
 truss.solve2d(node, material, section, structure, load, restrain)
-#print "Trigonometri: "
-#print truss.dataTrigonometri
-#print ""
+print "Trigonometri: "
+print truss.dataTrigonometri
+print ""
 print "Local Stiffness Matrix:"
 print truss.localStiffnessMatrix
 print "Global Stiffness Matrix:"
 print truss.globalStiffnessMatrix
 print "Load Matrix:"
 print truss.loadMatrix
+print "Unsolved stiffness matrix:"
+print truss.unsolvedGlobalStiffnessMatrix
+print "Unsolve load matrix:"
+print truss.unsolvedLoadMatrix
+print "Solution"
+print truss.solution
+
+#print np.allclose(np.dot(truss.unsolvedGlobalStiffnessMatrix, truss.solution), truss.unsolvedLoadMatrix)

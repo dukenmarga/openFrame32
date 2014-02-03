@@ -42,13 +42,18 @@ class Truss():
         self.localStiffnessMatrix = np.array([[[]]])
         self.globalStiffnessMatrix = np.array([[]])
         self.loadMatrix = np.array([])
+        self.unsolvedLoadMatrix = np.array([])
+        self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
+        self.solution = np.array([])
         pass
     def solve2d(self, node, material, section, structure, load, restrain):
         self.DOF = 2
         self.assembleTrigonometri(structure, node)
-        self.assembleLocalStiffness(structure, section)
+        self.assembleLocalStiffness(structure, section, material)
         self.assembleGlobalStiffness(structure, node)
         self.assembleLoad(load, node)
+        self.assembleUnsolvedMatrix(restrain, node)
+        self.solveMatrix()
         pass
     def assembleTrigonometri(self, structure, node):
         '''
@@ -94,22 +99,34 @@ class Truss():
             else:
                 self.dataTrigonometri = np.append(self.dataTrigonometri, [[S, C, T, length]], axis=0)
         pass
-    def assembleLocalStiffness(self, structure, section):
+    def assembleLocalStiffness(self, structure, section, material):
         i = 0
         indexArea = 0
-        indexSecondInertia = 1
+        #indexSecondInertia = 1
+        indexYoungModulus = 2
         indexLength = 3
         for element in structure.list:
+            # TODO: Ini kok n1 sama n2 ga kepake ya?
+            # salah di mana? harusnya dipake dong datanya
             # n1 & n2 are number of nodes for each element
+            # Solusi: kekakuan lokal dan global adalah
+            # kekuan di masing-masing node, bukan element saja
+            # Seharusnya masing-masing node dihitung kekakuannya,
+            # jadi kalo 1 node terhubung dengan banyak element,
+            # maka kekakuannya dipengaruhi oleh element yang
+            # terhubung dengan node itu
+            # kekakuan di bawah ini hanya kekakuan 1 node saja
             n1, n2 = element[0]-1, element[1]-1
             numberSection = element[2]-1
             
             # B = A*E/L
-            A = section.list[numberSection][indexArea]
-            E = section.list[numberSection][indexSecondInertia]
+            A = section.list[numberSection, indexArea]
+            #I = section.list[numberSection][indexSecondInertia]
+            typeMaterial = section.list[numberSection, indexYoungModulus]-1
+            E = material.list[typeMaterial][3]
             L = self.dataTrigonometri[i][indexLength]
             B = A * E / L
-            
+
             S = self.dataTrigonometri[i][0]
             C = self.dataTrigonometri[i][1]
             
@@ -126,7 +143,7 @@ class Truss():
         self.localStiffnessMatrix *= B
         pass
     def assembleGlobalStiffness(self, structure, node):
-        size = np.size(node.list, 1) * self.DOF
+        size = np.size(node.list, 0) * self.DOF
         self.globalStiffnessMatrix = np.array(np.zeros((size, size)))
         
         i = 0
@@ -146,7 +163,7 @@ class Truss():
             pass
         pass
     def assembleLoad(self, load, node):
-        size = np.size(node.list, 1) * 2 
+        size = np.size(node.list, 0) * 2 
         self.loadMatrix = np.array(np.zeros((size,1)))
         for load in load.list:
             node = load[0]
@@ -154,4 +171,27 @@ class Truss():
             Fy = load[2]
             self.loadMatrix[2*node-2:2*node] += [[Fx], [Fy]]
         pass
-    
+    def assembleUnsolvedMatrix(self, restrain, node):
+        # TODO: memilih unsolved matriks masih belum tepat
+        # curiganya si i cuman milih 1 baris aja
+        # solusi: bukan menambah pada matriks baru, coba hilangin
+        # aja baris2 yang direstrain
+        size = np.size(node.list, 0)
+        #for i in restrain.list:
+        #    if i > self.DOF*size-1:
+        #        return
+        sequence = np.arange(size * self.DOF)
+        unrestrainNode=[]
+        for i in sequence:
+            if i not in restrain.list:
+                unrestrainNode += [i]
+        unrestrainNode = np.array(unrestrainNode)
+
+        matrixStiffness = self.globalStiffnessMatrix[np.ix_(unrestrainNode, unrestrainNode)]
+        matrixLoad = self.loadMatrix[np.ix_(unrestrainNode)]
+
+        self.unsolvedGlobalStiffnessMatrix = np.array(matrixStiffness)/1000
+        self.unsolvedLoadMatrix = np.array(matrixLoad)
+        pass
+    def solveMatrix(self):
+        self.solution = np.linalg.lstsq(self.unsolvedGlobalStiffnessMatrix, self.unsolvedLoadMatrix)

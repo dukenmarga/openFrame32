@@ -42,13 +42,16 @@ class Restrain:
         ''' Add restrain to structure
             d.. = translation 
             r.. = rotation
+            dx = a-dimension
+            dy = a-dimension+1
+            dz = a-dimension+2
         '''
         a = dimension*node
-        if restrain == 'fixed':
-            restrained = [a-dimension, a-dimension+1, a-dimension+2]
-        elif restrain == 'pin':
+        if restrain == 'fixed': # 1,1,1
             restrained = [a-dimension, a-dimension+1]
-        elif restrain == 'roller':
+        elif restrain == 'pin': # 1,1,0
+            restrained = [a-dimension, a-dimension+1]
+        elif restrain == 'roller': # 0,1,0
             restrained = [a-dimension+1]
         else:
             return
@@ -56,4 +59,3 @@ class Restrain:
             self.list = np.array(restrained)
         else:
             self.list = np.append(self.list, restrained, axis=0)
-        

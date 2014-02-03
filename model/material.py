@@ -47,15 +47,15 @@ class Material:
     # F here means Fc for concrete or Fy for steel
     # material: steel, concrete
     def addMaterial(self, material, F, Fu=0, E=0, v=0):
-        if material == 'steel':
+        if material == 'concrete':
             indexMaterial = 1
-            v = 0.2
+            v = 0.17
             E = 4700 * math.sqrt(F)
             Fu = 1.1 * F
         else:
             indexMaterial = 2
             v = 0.3
-            E = 200000
+            E = 200000000000
             Fu = 1.1 * F
         if self.list.size == 0:
             self.list = np.array([[indexMaterial, F, Fu, E, v]])
