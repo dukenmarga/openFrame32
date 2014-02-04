@@ -35,24 +35,43 @@
 import numpy as np
 
 class Restrain:
+    ''' Define and manage restrain in node'''
     def __init__(self):
         self.list = np.array([])
         pass
     def addRestrain(self, node, restrain, dimension=2):
-        ''' Add restrain to structure
-            d.. = translation 
-            r.. = rotation
-            dx = a-dimension
-            dy = a-dimension+1
-            dz = a-dimension+2
+        ''' Add restrain to node in structure
+        
+        Parameters
+        ----------
+        node : int
+            Number of node
+        restrain : {'fixed', 'pin', 'roller'}
+            Type of restrain
+        dimension : int, optional
+            Dimension of structure (default: 2)
+        
+        Example
+        -------
+        This example shows how to add fixed restrain
+        to node 2 and roller restrain to node 4
+        
+        >>> restrain = Restrain()
+        >>> restrain.addRestrain(2, 'fixed')
+        >>> restrain.addRestrain(4, 'roller')
         '''
-        a = dimension*node
+        
+        # The logic is to determine node which are
+        # restrained based on the type
+        # This algorithm still use translation
+        # restrain without considering rotation
+        totalDOF = dimension*node
         if restrain == 'fixed': # 1,1,1
-            restrained = [a-dimension, a-dimension+1]
+            restrained = [totalDOF-dimension, totalDOF-dimension+1]
         elif restrain == 'pin': # 1,1,0
-            restrained = [a-dimension, a-dimension+1]
+            restrained = [totalDOF-dimension, totalDOF-dimension+1]
         elif restrain == 'roller': # 0,1,0
-            restrained = [a-dimension+1]
+            restrained = [totalDOF-dimension+1]
         else:
             return
         if self.list.size == 0:

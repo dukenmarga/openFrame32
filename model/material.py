@@ -36,7 +36,7 @@ import numpy as np
 import math
 
 class Material:
-    ''' Construct and define properties of
+    ''' Define and manage properties of
         material.
     '''
     def __init__(self):
@@ -89,6 +89,7 @@ class Material:
 
         Example
         -------
+
         >>> material = Material()
         >>> material.addMaterial('concrete', F=30000000) 
         >>> material.addMaterial('steel', F=400000000, Fu=600000000)

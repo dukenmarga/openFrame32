@@ -55,6 +55,7 @@ class Node:
             
         Example
         -------
+
         >>> node = Node()
         >>> node.addNode(12, 3)
         >>> node.addNode(13, 4, 5)
