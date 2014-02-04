@@ -53,6 +53,11 @@ class Material:
         v : float
             Poisson's ratio. Default is 0
         
+        Return
+        ------
+        out : float
+            Shear modulus
+        
         Example
         -------
         >>> material = Material()
