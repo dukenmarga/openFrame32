@@ -99,14 +99,20 @@ class Material:
         # indexMaterial: 1 for concrete, 2 for steel
         if material == 'concrete':
             indexMaterial = 1
-            v = 0.17
-            E = 4700 * math.sqrt(F)
-            Fu = 1.1 * F
+            if v == 0:
+                v = 0.17
+            if E ==0:
+                E = 4700 * math.sqrt(F)
+            if Fu == 0:
+                Fu = 1.1 * F
         else:
             indexMaterial = 2
-            v = 0.3
-            E = 200000000000
-            Fu = 1.1 * F
+            if v == 0:
+                v = 0.3
+            if E == 0:
+                E = 200000000000
+            if Fu == 0:
+                Fu = 1.1 * F
         if self.list.size == 0:
             self.list = np.array([[indexMaterial, F, Fu, E, v]])
         else:

@@ -53,7 +53,8 @@ class Truss():
         self.loadMatrix = np.array([])
         self.unsolvedLoadMatrix = np.array([])
         self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
-        self.solution = np.array([])
+        self.nodeDeformation = np.array([])
+        self.nodeForce = np.array([])
         pass
     def solve2d(self, node, material, section, structure, load, restrain):
         '''Solve Truss 2 dimension'''
@@ -64,7 +65,7 @@ class Truss():
         self.assembleGlobalStiffness(structure, node)
         self.assembleLoad(load, node)
         self.assembleUnsolvedMatrix(restrain, node)
-        self.solveMatrix()
+        self.solveDeformation()
         pass
     def assembleTrigonometri(self, structure, node):
         '''Stores value of sin and cos of angle
@@ -139,13 +140,14 @@ class Truss():
                       [C*S,   S*S, -C*S, -S*S],
                       [-C*C, -C*S,  C*C,  C*S],
                       [-C*S, -S*S,  C*S,  S*S]]
+            matrix = np.dot(matrix, B)
+
             if self.localStiffnessMatrix.size == 0:
                 self.localStiffnessMatrix = np.array([matrix])
             else:
                 self.localStiffnessMatrix= np.append(self.localStiffnessMatrix, \
                                                     [matrix], axis=0)
             i = i+1
-        self.localStiffnessMatrix *= B
         pass
     def assembleGlobalStiffness(self, structure, node):
         ''' Assemble global stiffness of structures'''
@@ -194,10 +196,13 @@ class Truss():
         matrixStiffness = self.globalStiffnessMatrix[np.ix_(unrestrainedNode, unrestrainedNode)]
         matrixLoad = self.loadMatrix[np.ix_(unrestrainedNode)]
 
-        self.unsolvedGlobalStiffnessMatrix = np.array(matrixStiffness)/1000
+        self.unsolvedGlobalStiffnessMatrix = np.array(matrixStiffness)
         self.unsolvedLoadMatrix = np.array(matrixLoad)
         pass
-    def solveMatrix(self):
-        '''Solve the matrix equation'''
+    def solveDeformation(self):
+        '''Find solution to the unsolved matrix equation'''
         # Use least-square function
-        self.solution = np.linalg.lstsq(self.unsolvedGlobalStiffnessMatrix, self.unsolvedLoadMatrix)
+        self.nodeDeformation = np.linalg.lstsq(self.unsolvedGlobalStiffnessMatrix, self.unsolvedLoadMatrix)
+    def solveInternalForce(self):
+        '''Calculate internal force in each node'''
+        
