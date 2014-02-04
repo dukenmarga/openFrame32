@@ -53,5 +53,3 @@ class Structure:
             self.list = np.array([[node1, node2, section]])
         else:
             self.list = np.append(self.list, [[node1, node2, section]], axis=0)
-    def AddRestraint(self, restraint):
-        pass
