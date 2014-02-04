@@ -42,7 +42,23 @@ class Material:
     def __init__(self):
         self.list = np.array([[]])
         pass
-    def defineShearModulus(self, E, v):
+    def defineShearModulus(self, E=0, v=0):
+        ''' Calculate shear modulus
+        
+        Parameters
+        ----------
+        E : float
+            Young's modulus of elasticity of material
+            Default value is 0
+        v : float
+            Poisson's ratio. Default is 0
+        
+        Example
+        -------
+        >>> material = Material()
+        >>> material.defineShearModulus(200000, 0.17)
+        85470.0854701
+        '''
         return E / (2*(1+v))
     
     def addMaterial(self, material, F, Fu=0, E=0, v=0):
@@ -59,7 +75,7 @@ class Material:
             Ultimit strength of material
             Default value is 1.1 times yield strength (F)
         E : float, optional
-            Young modulus elasticity of material
+            Young's modulus of elasticity of material
             Default value is :math:`4700*\\sqrt{F}` MPa for concrete
             and :math:`200000` MPa for steel
         v : float, optional
