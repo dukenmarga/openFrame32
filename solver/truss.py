@@ -55,6 +55,7 @@ class Truss():
         self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
         self.nodeDeformation = np.array([])
         self.nodeForce = np.array([])
+        self.nodeStress = np.array([])
         pass
     def solve2d(self, node, material, section, structure, load, restrain):
         '''Solve Truss 2 dimension'''
@@ -66,7 +67,7 @@ class Truss():
         self.assembleLoad(load, node)
         self.assembleUnsolvedMatrix(restrain, node)
         self.solveDeformation(restrain)
-        self.solveInternalForce(structure, section, material)
+        self.solveInternalForceStress(structure, section, material)
         pass
     def assembleTrigonometri(self, structure, node):
         '''Stores value of sin and cos of angle
@@ -122,7 +123,6 @@ class Truss():
         indexLength = 3
         for element in structure.list:
             #ArrayIndexing
-            n1, n2 = element[0]-1, element[1]-1
             numberSection = element[2]-1
             
             A = section.list[numberSection, indexArea]
@@ -205,7 +205,7 @@ class Truss():
         unknownNodeDeformation = np.linalg.solve(self.unsolvedGlobalStiffnessMatrix, self.unsolvedLoadMatrix)
         self.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
         self.nodeDeformation[restrain.list] = 0
-    def solveInternalForce(self, structure, section, material):
+    def solveInternalForceStress(self, structure, section, material):
         '''Calculate internal force for each node'''
         # All index number below are using ArrayIndexing
         indexArea = 0
@@ -213,29 +213,39 @@ class Truss():
         indexLength = 3
         i = 0
         for element in structure.list:
+            #NormalIndexing
+            n1, n2 = element[0], element[1]
             #ArrayIndexing
-            n1, n2 = element[0]-1, element[1]-1
             numberSection = element[2]-1
             
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
             L = self.dataTrigonometri[i][indexLength]
-            B = A * E / L
+            B = E / L
 
             S = self.dataTrigonometri[i][0]
             C = self.dataTrigonometri[i][1]
-            
+                        
             matrix = [[C, S, 0, 0],
                       [0, 0, C, S]]
-            r = np.dot(B, np.array([[1,  -1],
+
+            #Stress
+            s = np.dot(B, np.array([[1,  -1]]))
+            s = np.dot(s, matrix)
+            s = np.dot(s, self.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
+
+            #Force
+            f = np.dot(B*A, np.array([[1,  -1],
                                [-1,  1]]))
-            r = np.dot(r, matrix)
-            r = np.dot(r, self.nodeDeformation[np.ix_([2*n1-2,2*n1, 2*n2-2,2*n2])])
+            f = np.dot(f, matrix)
+            f = np.dot(f, self.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
 
             if self.nodeForce.size == 0:
-                self.nodeForce = np.array(r)
+                self.nodeStress = np.array(s)
+                self.nodeForce = np.array(f)
             else:
-                self.nodeForce = np.append(self.nodeForce, r, axis=0)
+                self.nodeStress = np.append(self.nodeStress, s, axis=0)
+                self.nodeForce = np.append(self.nodeForce, f, axis=0)
             i = i+1
-        pass
+        pass    
