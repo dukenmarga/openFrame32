@@ -38,6 +38,7 @@ class Restrain:
     ''' Define and manage restrain in node'''
     def __init__(self):
         self.list = np.array([])
+        self.settlement = np.array([])
         pass
     def addRestrain(self, node, restrain, dimension=2):
         ''' Add restrain to node in structure
@@ -70,11 +71,21 @@ class Restrain:
             restrained = [totalDOF-dimension, totalDOF-dimension+1]
         elif restrain == 'pin': # 1,1,0
             restrained = [totalDOF-dimension, totalDOF-dimension+1]
-        elif restrain == 'roller': # 0,1,0
+        elif restrain == 'rollerX' or restrain == 'roller': # 0,1,0
             restrained = [totalDOF-dimension+1]
+        elif restrain == 'rollerY': # 1,0,0
+            restrained = [totalDOF-dimension]
         else:
             return
         if self.list.size == 0:
             self.list = np.array(restrained)
         else:
             self.list = np.append(self.list, restrained, axis=0)
+    def addSettlement(self, node, (dx, dy), dimension=2):
+        '''Add settlement to node'''
+        if self.settlement.size == 0:
+            self.settlement = np.array([[node, dx, dy]])
+        else:
+            self.settlement = np.append(self.settlement, [[node, dx, dy]], axis=0)
+        pass
+    
