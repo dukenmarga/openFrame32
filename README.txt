@@ -2,8 +2,8 @@ What is openSAP32
 =================
 openSAP32 is open source software for modelling and perform structural analysis.
 This software is intended for students and civil engineers (especially structural engineer) who wants to compute structure's response such as deflection and internal force.
-Many softwares are created outhere but they are good softwares that are too expensive to me to perform some simple analysis. So this software is born to satisfy my need and my thirstiness of knowledge in structural analysis.
-Right now this software can only be used to perform structural analysis for some simple structures. There will be GUI (Graphical User Interface), but that's still a long journey to get there. The development will be focused in solver engine and writing clean and tidy code.
+Many softwares are created out there but they are good softwares that are too expensive for me to perform some simple analysis. So this software is born to satisfy my need and my thirstiness of knowledge in structural analysis.
+Right now this software can only be used to perform structural analysis for some simple structures. There will be GUI (Graphical User Interface), but that's still a long journey to get there. The development will be focused to solver engine and writing clean and tidy code.
 
 Features
 ========
@@ -20,6 +20,10 @@ Features
 * Section:
  ** Area must be provided manually (there is not yet method to input dimension of section)
  ** Second momen of inertia must be provided manually (there is not yet method to input dimension of section)
+* Structure's response
+ ** Nodal displacement
+ ** End Element force
+ ** Axial Stress
 
 About Author
 ============
