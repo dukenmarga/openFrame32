@@ -52,6 +52,7 @@ class Truss():
         self.globalStiffnessMatrix = np.array([[]])
         self.loadMatrix = np.array([])
         self.unsolvedLoadMatrix = np.array([])
+        self.unsolvedLoadMatrixWithSettlement = np.array([])
         self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
         self.nodeDeformation = np.array([])
         self.nodeForce = np.array([])
@@ -196,15 +197,33 @@ class Truss():
 
         self.unsolvedGlobalStiffnessMatrix = np.array(unsolvedStiffness)
         self.unsolvedLoadMatrix = np.array(unsolvedLoad)
+        
+        # Calculate final load due to settlement
+        self.unsolvedLoadMatrixWithSettlement = self.unsolvedLoadMatrix
+        for deformation in restrain.settlement:
+            n = deformation[0]-1
+            dx = deformation[1]
+            dy = deformation[2]
+            self.unsolvedLoadMatrixWithSettlement = \
+                self.unsolvedLoadMatrixWithSettlement \
+                - self.globalStiffnessMatrix[n, n] * dx \
+                - self.globalStiffnessMatrix[n+1, n+1] * dy
         pass
     def solveDeformation(self,restrain):
         '''Find deformation for each node'''
         self.nodeDeformation = np.zeros((self.totalDOF, 1))
         # Use least-square function
         # TODO: use try except to handle singular matrix using lnsqt
-        unknownNodeDeformation = np.linalg.solve(self.unsolvedGlobalStiffnessMatrix, self.unsolvedLoadMatrix)
+        unknownNodeDeformation = np.linalg.solve(self.unsolvedGlobalStiffnessMatrix,\
+                                                 self.unsolvedLoadMatrixWithSettlement)
         self.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
         self.nodeDeformation[restrain.list] = 0
+        for deformation in restrain.settlement:
+            n = deformation[0]-1
+            dx = deformation[1]
+            dy = deformation[2]
+            self.nodeDeformation[n] =+ dx
+            self.nodeDeformation[n+1] += dy
     def solveInternalForceStress(self, structure, section, material):
         '''Calculate internal force for each node'''
         # All index number below are using ArrayIndexing
