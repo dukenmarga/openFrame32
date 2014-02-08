@@ -8,22 +8,23 @@ Right now this software can only be used to perform structural analysis for some
 Features
 ========
 * Structural types:
- ** Truss 2D
+	* Truss 2D
 * Load type:
- ** Axial load to node in x and y direction
+	* Axial load to node in x and y direction
 * Restrain:
- ** Fixed
- ** Pin
- ** Roller (restrained in y direction)
+	* Fixed
+	* Pin
+	* Roller (restrained in x or y direction)
+	* Add initial settlement 
 * Material:
- ** Concrete and steel material
+	* Concrete and steel material
 * Section:
- ** Area must be provided manually (there is not yet method to input dimension of section)
- ** Second momen of inertia must be provided manually (there is not yet method to input dimension of section)
+	* Area must be provided manually (there is not yet method to input dimension of section)
+	* Second momen of inertia must be provided manually (there is not yet method to input dimension of section)
 * Structure's response
- ** Nodal displacement
- ** End Element force
- ** Axial Stress
+	* Nodal displacement
+	* End Element force
+	* Axial Stress
 
 About Author
 ============
