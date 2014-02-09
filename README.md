@@ -32,6 +32,7 @@ Todo
 ====
 * Simple drawing using openGL
 * Analysis for Truss 3D
+* Point load with specific angle
 
 About Author
 ============
