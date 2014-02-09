@@ -5,6 +5,7 @@ This software is intended for students and civil engineers (especially structura
 Many softwares are created out there but they are good softwares that are too expensive for me to perform some simple analysis. So this software is born to satisfy my need and my thirstiness of knowledge in structural analysis.
 Right now this software can only be used to perform structural analysis for some simple structures. There will be GUI (Graphical User Interface), but that's still a long journey to get there. The development will be focused to solver engine and writing clean and tidy code.
 
+
 Features
 ========
 * Structural types:
@@ -25,6 +26,12 @@ Features
 	* Nodal displacement
 	* End Element force
 	* Axial Stress
+
+
+Todo
+====
+*Simple drawing using openGL
+*Analysis for Truss 3D
 
 About Author
 ============
