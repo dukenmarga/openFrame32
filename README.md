@@ -30,8 +30,8 @@ Features
 
 Todo
 ====
-*Simple drawing using openGL
-*Analysis for Truss 3D
+* Simple drawing using openGL
+* Analysis for Truss 3D
 
 About Author
 ============
