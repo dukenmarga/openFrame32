@@ -39,6 +39,7 @@ class Restrain:
     def __init__(self):
         self.list = np.array([])
         self.settlement = np.array([])
+        self.spring = np.array([])
         pass
     def addRestrain(self, node, restrain, dimension=2):
         ''' Add restrain to node in structure
@@ -88,4 +89,20 @@ class Restrain:
         else:
             self.settlement = np.append(self.settlement, [[node, dx, dy]], axis=0)
         pass
-    
+    def addSpring(self, node, k, direction='x', dimension=2):
+        '''Add spring restrain to node'''
+        if direction == 'x':
+            angle = 180
+        elif direction == '-x':
+            angle = 0
+        elif direction == 'y':
+            angle = 270
+        elif direction == '-y':
+            angle = 90
+
+        if self.spring.size == 0:
+            self.spring = np.array([[node, k, angle]])
+        else:
+            self.spring = np.append(self.spring, [[node, k, angle]], axis=0)
+        pass
+        

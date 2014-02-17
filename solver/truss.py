@@ -61,16 +61,18 @@ class Truss():
     def solve2d(self, node, material, section, structure, load, restrain):
         '''Solve Truss 2 dimension'''
         self.DOF = 2 # degree of freedom each node
-        self.totalDOF = np.size(node.list, 0) * self.DOF
-        self.assembleTrigonometri(structure, node)
-        self.assembleLocalStiffness(structure, section, material)
-        self.assembleGlobalStiffness(structure, node)
+        self.totalNode = np.size(node.list, 0)
+        self.totalMember = np.size(structure.list, 0)
+        self.totalDOF = self.totalNode * self.DOF
+        self.assembleTrigonometri(structure, restrain, node)
+        self.assembleLocalStiffness(structure, restrain, section, material)
+        self.assembleGlobalStiffness(structure, restrain, node)
         self.assembleLoad(load, node)
         self.assembleUnsolvedMatrix(restrain, node)
         self.solveDeformation(restrain)
         self.solveInternalForceStress(structure, section, material)
         pass
-    def assembleTrigonometri(self, structure, node):
+    def assembleTrigonometri(self, structure, restrain, node):
         '''Stores value of sin and cos of angle
         that is formed beetween 2 nodes for
         each element in structure.
@@ -88,7 +90,10 @@ class Truss():
         :math:`Tan = a/b`
                 
         '''
+        # ELEMENT
         for element in structure.list:
+            if self.totalMember == 0:
+                break
             # n1 & n2 are number of nodes for each element
             # ArrayIndexing
             n1, n2 = element[0]-1, element[1]-1
@@ -112,8 +117,25 @@ class Truss():
                 self.dataTrigonometri = np.array([[S, C, T, length]])
             else:
                 self.dataTrigonometri = np.append(self.dataTrigonometri, [[S, C, T, length]], axis=0)
+        
+
+        # SPRING
+        for spring in restrain.spring:
+            # S=sin C=cos T=tan
+            S = maths.sin(spring[2])
+            C = maths.cos(spring[2])
+            if C < 1e-10:
+                C = 0
+            T = 0
+
+            length = 0
+            # Store trigonometri data of each element
+            if self.dataTrigonometri.size == 0:
+                self.dataTrigonometri = np.array([[S, C, T, length]])
+            else:
+                self.dataTrigonometri = np.append(self.dataTrigonometri, [[S, C, T, length]], axis=0)
         pass
-    def assembleLocalStiffness(self, structure, section, material):
+    def assembleLocalStiffness(self, structure, restrain, section, material):
         '''Assemble local stiffness of each element
         Local stiffness is also known as element stiffness
         '''
@@ -122,7 +144,11 @@ class Truss():
         indexArea = 0
         indexYoungModulus = 2
         indexLength = 3
+
+        # LOCAL STIFFNESS FROM ELEMENT
         for element in structure.list:
+            if self.totalMember == 0:
+                break
             #ArrayIndexing
             numberSection = element[2]-1
             
@@ -147,11 +173,33 @@ class Truss():
                 self.localStiffnessMatrix= np.append(self.localStiffnessMatrix, \
                                                     [matrix], axis=0)
             i = i+1
+        
+        # LOCAL STIFFNESS FROM SPRING
+        i = self.totalMember
+        for spring in restrain.spring:
+            k = spring[1]
+
+            S = self.dataTrigonometri[i][0]
+            C = self.dataTrigonometri[i][1]
+            
+            matrix = [[C*C,   C*S, -C*C, -C*S],
+                      [C*S,   S*S, -C*S, -S*S],
+                      [-C*C, -C*S,  C*C,  C*S],
+                      [-C*S, -S*S,  C*S,  S*S]]
+            matrix = np.dot(matrix, k)
+
+            if self.localStiffnessMatrix.size == 0:
+                self.localStiffnessMatrix = np.array([matrix])
+            else:
+                self.localStiffnessMatrix= np.append(self.localStiffnessMatrix, \
+                                                    [matrix], axis=0)
+            i = i+1
         pass
-    def assembleGlobalStiffness(self, structure, node):
+    def assembleGlobalStiffness(self, structure, restrain, node):
         ''' Assemble global stiffness of structures'''
         self.globalStiffnessMatrix = np.array(np.zeros((self.totalDOF, self.totalDOF)))
         
+        # ELEMENT
         i = 0
         for element in structure.list:
             # n1 & n2 are number of nodes for each element
@@ -169,6 +217,19 @@ class Truss():
             self.globalStiffnessMatrix[b1:b2, b1:b2] += self.localStiffnessMatrix[i, 2:4, 2:4]
             i = i+1
             pass
+
+        # SPRING
+        i = self.totalMember
+        for spring in restrain.spring:
+            # n is number of spring nodes 
+            # ArrayIndexing
+            n = spring[0]
+            
+            #ArrayIndexing
+            a1 = 2*n-2
+            a2 = 2*n
+            self.globalStiffnessMatrix[a1:a2, a1:a2] += self.localStiffnessMatrix[i, 0:2, 0:2]
+            i = i+1
         pass
     def assembleLoad(self, load, node):
         '''Assemble load matrix'''
@@ -214,6 +275,7 @@ class Truss():
         self.nodeDeformation = np.zeros((self.totalDOF, 1))
         # Use least-square function
         # TODO: use try except to handle singular matrix using lnsqt
+        
         unknownNodeDeformation = np.linalg.solve(self.unsolvedGlobalStiffnessMatrix,\
                                                  self.unsolvedLoadMatrixWithSettlement)
         self.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
