@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.unsolvedLoadMatrix = np.array([])
         self.unsolvedLoadMatrixWithSettlement = np.array([])
         self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
         self.nodeDeformation = np.array([])
@@ -253,10 +252,10 @@ class Truss():
         unsolvedLoad = rec.pre.loadMatrix[np.ix_(self.unrestrainedNode)]
 
         self.unsolvedGlobalStiffnessMatrix = np.array(unsolvedStiffness)
-        self.unsolvedLoadMatrix = np.array(unsolvedLoad)
+        rec.pre.unsolvedLoadMatrix = np.array(unsolvedLoad)
         
         # Calculate final load due to settlement
-        self.unsolvedLoadMatrixWithSettlement = self.unsolvedLoadMatrix
+        self.unsolvedLoadMatrixWithSettlement = rec.pre.unsolvedLoadMatrix
         for deformation in restrain.settlement:
             n = deformation[0]-1
             dx = deformation[1]
