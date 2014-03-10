@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.loadMatrix = np.array([])
         self.unsolvedLoadMatrix = np.array([])
         self.unsolvedLoadMatrixWithSettlement = np.array([])
         self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
@@ -64,7 +63,7 @@ class Truss():
         self.assembleTrigonometri(structure, restrain, node, rec)
         self.assembleLocalStiffness(structure, restrain, section, material, rec)
         self.assembleGlobalStiffness(structure, restrain, node, rec)
-        self.assembleLoad(load, node)
+        self.assembleLoad(load, node, rec)
         self.assembleUnsolvedMatrix(restrain, node, rec)
         self.solveDeformation(restrain)
         self.solveInternalForceStress(structure, section, material, rec)
@@ -228,14 +227,14 @@ class Truss():
             rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
             i = i+1
         pass
-    def assembleLoad(self, load, node):
+    def assembleLoad(self, load, node, rec):
         '''Assemble load matrix'''
-        self.loadMatrix = np.array(np.zeros((self.totalDOF,1)))
+        rec.pre.loadMatrix = np.array(np.zeros((self.totalDOF,1)))
         for load in load.list:
             node = load[0]
             Fx = load[1]
             Fy = load[2]
-            self.loadMatrix[2*node-2:2*node] += [[Fx], [Fy]]
+            rec.pre.loadMatrix[2*node-2:2*node] += [[Fx], [Fy]]
         pass
     def assembleUnsolvedMatrix(self, restrain, node, rec):
         '''Construct unsolved matrix.
@@ -251,7 +250,7 @@ class Truss():
         self.unrestrainedNode = np.array(unrestrainedNode)
 
         unsolvedStiffness = rec.pre.globalStiffnessMatrix[np.ix_(self.unrestrainedNode, self.unrestrainedNode)]
-        unsolvedLoad = self.loadMatrix[np.ix_(self.unrestrainedNode)]
+        unsolvedLoad = rec.pre.loadMatrix[np.ix_(self.unrestrainedNode)]
 
         self.unsolvedGlobalStiffnessMatrix = np.array(unsolvedStiffness)
         self.unsolvedLoadMatrix = np.array(unsolvedLoad)
