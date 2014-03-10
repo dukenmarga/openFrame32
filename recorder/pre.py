@@ -37,4 +37,5 @@ import numpy as np
 class Pre():
     def __init__(self):
         self.T = np.array([[]])
+        self.localStiffnessMatrix = np.array([[[]]])
         pass
