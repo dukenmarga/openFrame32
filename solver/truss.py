@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.nodeStress = np.array([])
         pass
     def solve2d(self, node, material, section, structure, load, restrain, rec):
         '''Solve Truss 2 dimension'''
@@ -314,10 +313,10 @@ class Truss():
             f = np.dot(f, rec.post.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
 
             if rec.post.nodeForce.size == 0:
-                self.nodeStress = np.array(s)
+                rec.post.nodeStress = np.array(s)
                 rec.post.nodeForce = np.array(f)
             else:
-                self.nodeStress = np.append(self.nodeStress, s, axis=0)
+                rec.post.nodeStress = np.append(rec.post.nodeStress, s, axis=0)
                 rec.post.nodeForce = np.append(rec.post.nodeForce, f, axis=0)
             i = i+1
         pass
