@@ -34,7 +34,7 @@
 
 import numpy as np
 
-class Trigonometri():
+class Pre():
     def __init__(self):
         self.T = np.array([[]])
         pass

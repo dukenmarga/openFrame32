@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        #self.dataTrigonometri = np.array([[]])
         self.localStiffnessMatrix = np.array([[[]]])
         self.globalStiffnessMatrix = np.array([[]])
         self.loadMatrix = np.array([])
@@ -113,10 +112,10 @@ class Truss():
             T = 0 #a/b
             
             # Store trigonometri data of each element
-            if rec.trigonometri.T.size == 0:
-                rec.trigonometri.T = np.array([[S, C, T, length]])
+            if rec.pre.T.size == 0:
+                rec.pre.T = np.array([[S, C, T, length]])
             else:
-                rec.trigonometri.T = np.append(rec.trigonometri.T, [[S, C, T, length]], axis=0)
+                rec.pre.T = np.append(rec.pre.T, [[S, C, T, length]], axis=0)
         
 
         # SPRING
@@ -130,10 +129,10 @@ class Truss():
 
             length = 0
             # Store trigonometri data of each element
-            if rec.trigonometri.T.size == 0:
-                rec.trigonometri.T = np.array([[S, C, T, length]])
+            if rec.pre.T.size == 0:
+                rec.pre.T = np.array([[S, C, T, length]])
             else:
-                rec.trigonometri.T = np.append(rec.trigonometri.T, [[S, C, T, length]], axis=0)
+                rec.pre.T = np.append(rec.pre.T, [[S, C, T, length]], axis=0)
         pass
     def assembleLocalStiffness(self, structure, restrain, section, material, rec):
         '''Assemble local stiffness of each element
@@ -155,11 +154,11 @@ class Truss():
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
-            L = rec.trigonometri.T[i][indexLength]
+            L = rec.pre.T[i][indexLength]
             B = A * E / L
 
-            S = rec.trigonometri.T[i][0]
-            C = rec.trigonometri.T[i][1]
+            S = rec.pre.T[i][0]
+            C = rec.pre.T[i][1]
             
             matrix = [[C*C,   C*S, -C*C, -C*S],
                       [C*S,   S*S, -C*S, -S*S],
@@ -179,8 +178,8 @@ class Truss():
         for spring in restrain.spring:
             k = spring[1]
 
-            S = rec.trigonometri.T[i][0]
-            C = rec.trigonometri.T[i][1]
+            S = rec.pre.T[i][0]
+            C = rec.pre.T[i][1]
             
             matrix = [[C*C,   C*S, -C*C, -C*S],
                       [C*S,   S*S, -C*S, -S*S],
@@ -302,11 +301,11 @@ class Truss():
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
-            L = rec.trigonometri.T[i][indexLength]
+            L = rec.pre.T[i][indexLength]
             B = E / L
 
-            S = rec.trigonometri.T[i][0]
-            C = rec.trigonometri.T[i][1]
+            S = rec.pre.T[i][0]
+            C = rec.pre.T[i][1]
                         
             matrix = [[C, S, 0, 0],
                       [0, 0, C, S]]

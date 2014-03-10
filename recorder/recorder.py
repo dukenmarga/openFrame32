@@ -32,10 +32,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------
 
-from trigonometri import Trigonometri
+from pre import Pre
 
 class Recorder():
     def __init__(self):
-        self.trigonometri = Trigonometri()
+        self.pre = Pre()
         pass
     
