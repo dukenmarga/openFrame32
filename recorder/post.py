@@ -37,4 +37,5 @@ import numpy as np
 class Post():
     def __init__(self):
         self.nodeDeformation = np.array([])
+        self.nodeForce = np.array([])
         pass

@@ -33,9 +33,11 @@
 # ----------------------------------------------------------------------
 
 from pre import Pre
+from post import Post
 
 class Recorder():
     def __init__(self):
         self.pre = Pre()
+        self.post = Post()
         pass
     
