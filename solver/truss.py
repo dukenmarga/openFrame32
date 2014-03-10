@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.nodeDeformation = np.array([])
         self.nodeForce = np.array([])
         self.nodeStress = np.array([])
         pass
@@ -265,20 +264,20 @@ class Truss():
         pass
     def solveDeformation(self,restrain, rec):
         '''Find deformation for each node'''
-        self.nodeDeformation = np.zeros((self.totalDOF, 1))
+        rec.post.nodeDeformation = np.zeros((self.totalDOF, 1))
         # Use least-square function
         # TODO: use try except to handle singular matrix using lnsqt
         
         unknownNodeDeformation = np.linalg.solve(rec.pre.unsolvedGlobalStiffnessMatrix,\
                                                  rec.pre.unsolvedLoadMatrixWithSettlement)
-        self.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
-        self.nodeDeformation[restrain.list] = 0
+        rec.post.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
+        rec.post.nodeDeformation[restrain.list] = 0
         for deformation in restrain.settlement:
             n = deformation[0]-1
             dx = deformation[1]
             dy = deformation[2]
-            self.nodeDeformation[n] =+ dx
-            self.nodeDeformation[n+1] += dy
+            rec.post.nodeDeformation[n] =+ dx
+            rec.post.nodeDeformation[n+1] += dy
     def solveInternalForceStress(self, structure, section, material, rec):
         '''Calculate internal force for each node'''
         # All index number below are using ArrayIndexing
@@ -307,13 +306,13 @@ class Truss():
             #Stress
             s = np.dot(B, np.array([[1,  -1]]))
             s = np.dot(s, matrix)
-            s = np.dot(s, self.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
+            s = np.dot(s, rec.post.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
 
             #Force
             f = np.dot(B*A, np.array([[1,  -1],
                                [-1,  1]]))
             f = np.dot(f, matrix)
-            f = np.dot(f, self.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
+            f = np.dot(f, rec.post.nodeDeformation[np.ix_([2*n1-2,2*n1-1, 2*n2-2,2*n2-1])])
 
             if self.nodeForce.size == 0:
                 self.nodeStress = np.array(s)
