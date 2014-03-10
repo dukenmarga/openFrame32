@@ -42,4 +42,5 @@ class Pre():
         self.loadMatrix = np.array([])
         self.unsolvedLoadMatrix = np.array([])
         self.unsolvedLoadMatrixWithSettlement = np.array([])
+        self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
         pass
