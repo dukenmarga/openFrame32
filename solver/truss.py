@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.globalStiffnessMatrix = np.array([[]])
         self.loadMatrix = np.array([])
         self.unsolvedLoadMatrix = np.array([])
         self.unsolvedLoadMatrixWithSettlement = np.array([])
@@ -66,7 +65,7 @@ class Truss():
         self.assembleLocalStiffness(structure, restrain, section, material, rec)
         self.assembleGlobalStiffness(structure, restrain, node, rec)
         self.assembleLoad(load, node)
-        self.assembleUnsolvedMatrix(restrain, node)
+        self.assembleUnsolvedMatrix(restrain, node, rec)
         self.solveDeformation(restrain)
         self.solveInternalForceStress(structure, section, material, rec)
         pass
@@ -195,7 +194,7 @@ class Truss():
         pass
     def assembleGlobalStiffness(self, structure, restrain, node, rec):
         ''' Assemble global stiffness of structures'''
-        self.globalStiffnessMatrix = np.array(np.zeros((self.totalDOF, self.totalDOF)))
+        rec.pre.globalStiffnessMatrix = np.array(np.zeros((self.totalDOF, self.totalDOF)))
         
         # ELEMENT
         i = 0
@@ -209,10 +208,10 @@ class Truss():
             a2 = 2*n1
             b1 = 2*n2-2
             b2 = 2*n2
-            self.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
-            self.globalStiffnessMatrix[a1:a2, b1:b2] += rec.pre.localStiffnessMatrix[i, 0:2, 2:4]
-            self.globalStiffnessMatrix[b1:b2, a1:a2] += rec.pre.localStiffnessMatrix[i, 2:4, 0:2]
-            self.globalStiffnessMatrix[b1:b2, b1:b2] += rec.pre.localStiffnessMatrix[i, 2:4, 2:4]
+            rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
+            rec.pre.globalStiffnessMatrix[a1:a2, b1:b2] += rec.pre.localStiffnessMatrix[i, 0:2, 2:4]
+            rec.pre.globalStiffnessMatrix[b1:b2, a1:a2] += rec.pre.localStiffnessMatrix[i, 2:4, 0:2]
+            rec.pre.globalStiffnessMatrix[b1:b2, b1:b2] += rec.pre.localStiffnessMatrix[i, 2:4, 2:4]
             i = i+1
             pass
 
@@ -226,7 +225,7 @@ class Truss():
             #ArrayIndexing
             a1 = 2*n-2
             a2 = 2*n
-            self.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
+            rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
             i = i+1
         pass
     def assembleLoad(self, load, node):
@@ -238,7 +237,7 @@ class Truss():
             Fy = load[2]
             self.loadMatrix[2*node-2:2*node] += [[Fx], [Fy]]
         pass
-    def assembleUnsolvedMatrix(self, restrain, node):
+    def assembleUnsolvedMatrix(self, restrain, node, rec):
         '''Construct unsolved matrix.
         Unsolved matrix is consist of matrix of global stiffness of node
         which are not restrained and matrix of load at unrestrained node.
@@ -251,7 +250,7 @@ class Truss():
                 unrestrainedNode += [i]
         self.unrestrainedNode = np.array(unrestrainedNode)
 
-        unsolvedStiffness = self.globalStiffnessMatrix[np.ix_(self.unrestrainedNode, self.unrestrainedNode)]
+        unsolvedStiffness = rec.pre.globalStiffnessMatrix[np.ix_(self.unrestrainedNode, self.unrestrainedNode)]
         unsolvedLoad = self.loadMatrix[np.ix_(self.unrestrainedNode)]
 
         self.unsolvedGlobalStiffnessMatrix = np.array(unsolvedStiffness)
@@ -265,8 +264,8 @@ class Truss():
             dy = deformation[2]
             self.unsolvedLoadMatrixWithSettlement = \
                 self.unsolvedLoadMatrixWithSettlement \
-                - self.globalStiffnessMatrix[n, n] * dx \
-                - self.globalStiffnessMatrix[n+1, n+1] * dy
+                - rec.pre.globalStiffnessMatrix[n, n] * dx \
+                - rec.pre.globalStiffnessMatrix[n+1, n+1] * dy
         pass
     def solveDeformation(self,restrain):
         '''Find deformation for each node'''

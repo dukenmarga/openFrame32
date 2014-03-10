@@ -38,4 +38,5 @@ class Pre():
     def __init__(self):
         self.T = np.array([[]])
         self.localStiffnessMatrix = np.array([[[]]])
+        self.globalStiffnessMatrix = np.array([[]])
         pass
