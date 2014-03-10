@@ -47,7 +47,7 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.dataTrigonometri = np.array([[]])
+        #self.dataTrigonometri = np.array([[]])
         self.localStiffnessMatrix = np.array([[[]]])
         self.globalStiffnessMatrix = np.array([[]])
         self.loadMatrix = np.array([])
@@ -58,21 +58,21 @@ class Truss():
         self.nodeForce = np.array([])
         self.nodeStress = np.array([])
         pass
-    def solve2d(self, node, material, section, structure, load, restrain):
+    def solve2d(self, node, material, section, structure, load, restrain, rec):
         '''Solve Truss 2 dimension'''
         self.DOF = 2 # degree of freedom each node
         self.totalNode = np.size(node.list, 0)
         self.totalMember = np.size(structure.list, 0)
         self.totalDOF = self.totalNode * self.DOF
-        self.assembleTrigonometri(structure, restrain, node)
-        self.assembleLocalStiffness(structure, restrain, section, material)
+        self.assembleTrigonometri(structure, restrain, node, rec)
+        self.assembleLocalStiffness(structure, restrain, section, material, rec)
         self.assembleGlobalStiffness(structure, restrain, node)
         self.assembleLoad(load, node)
         self.assembleUnsolvedMatrix(restrain, node)
         self.solveDeformation(restrain)
-        self.solveInternalForceStress(structure, section, material)
+        self.solveInternalForceStress(structure, section, material, rec)
         pass
-    def assembleTrigonometri(self, structure, restrain, node):
+    def assembleTrigonometri(self, structure, restrain, node, rec):
         '''Stores value of sin and cos of angle
         that is formed beetween 2 nodes for
         each element in structure.
@@ -113,10 +113,10 @@ class Truss():
             T = 0 #a/b
             
             # Store trigonometri data of each element
-            if self.dataTrigonometri.size == 0:
-                self.dataTrigonometri = np.array([[S, C, T, length]])
+            if rec.trigonometri.T.size == 0:
+                rec.trigonometri.T = np.array([[S, C, T, length]])
             else:
-                self.dataTrigonometri = np.append(self.dataTrigonometri, [[S, C, T, length]], axis=0)
+                rec.trigonometri.T = np.append(rec.trigonometri.T, [[S, C, T, length]], axis=0)
         
 
         # SPRING
@@ -130,12 +130,12 @@ class Truss():
 
             length = 0
             # Store trigonometri data of each element
-            if self.dataTrigonometri.size == 0:
-                self.dataTrigonometri = np.array([[S, C, T, length]])
+            if rec.trigonometri.T.size == 0:
+                rec.trigonometri.T = np.array([[S, C, T, length]])
             else:
-                self.dataTrigonometri = np.append(self.dataTrigonometri, [[S, C, T, length]], axis=0)
+                rec.trigonometri.T = np.append(rec.trigonometri.T, [[S, C, T, length]], axis=0)
         pass
-    def assembleLocalStiffness(self, structure, restrain, section, material):
+    def assembleLocalStiffness(self, structure, restrain, section, material, rec):
         '''Assemble local stiffness of each element
         Local stiffness is also known as element stiffness
         '''
@@ -155,11 +155,11 @@ class Truss():
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
-            L = self.dataTrigonometri[i][indexLength]
+            L = rec.trigonometri.T[i][indexLength]
             B = A * E / L
 
-            S = self.dataTrigonometri[i][0]
-            C = self.dataTrigonometri[i][1]
+            S = rec.trigonometri.T[i][0]
+            C = rec.trigonometri.T[i][1]
             
             matrix = [[C*C,   C*S, -C*C, -C*S],
                       [C*S,   S*S, -C*S, -S*S],
@@ -179,8 +179,8 @@ class Truss():
         for spring in restrain.spring:
             k = spring[1]
 
-            S = self.dataTrigonometri[i][0]
-            C = self.dataTrigonometri[i][1]
+            S = rec.trigonometri.T[i][0]
+            C = rec.trigonometri.T[i][1]
             
             matrix = [[C*C,   C*S, -C*C, -C*S],
                       [C*S,   S*S, -C*S, -S*S],
@@ -286,7 +286,7 @@ class Truss():
             dy = deformation[2]
             self.nodeDeformation[n] =+ dx
             self.nodeDeformation[n+1] += dy
-    def solveInternalForceStress(self, structure, section, material):
+    def solveInternalForceStress(self, structure, section, material, rec):
         '''Calculate internal force for each node'''
         # All index number below are using ArrayIndexing
         indexArea = 0
@@ -302,11 +302,11 @@ class Truss():
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
-            L = self.dataTrigonometri[i][indexLength]
+            L = rec.trigonometri.T[i][indexLength]
             B = E / L
 
-            S = self.dataTrigonometri[i][0]
-            C = self.dataTrigonometri[i][1]
+            S = rec.trigonometri.T[i][0]
+            C = rec.trigonometri.T[i][1]
                         
             matrix = [[C, S, 0, 0],
                       [0, 0, C, S]]
@@ -329,4 +329,4 @@ class Truss():
                 self.nodeStress = np.append(self.nodeStress, s, axis=0)
                 self.nodeForce = np.append(self.nodeForce, f, axis=0)
             i = i+1
-        pass    
+        pass
