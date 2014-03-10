@@ -47,7 +47,6 @@ class Truss():
     '''
     def __init__(self):
         self.list = np.array([[]])
-        self.unsolvedLoadMatrixWithSettlement = np.array([])
         self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
         self.nodeDeformation = np.array([])
         self.nodeForce = np.array([])
@@ -64,7 +63,7 @@ class Truss():
         self.assembleGlobalStiffness(structure, restrain, node, rec)
         self.assembleLoad(load, node, rec)
         self.assembleUnsolvedMatrix(restrain, node, rec)
-        self.solveDeformation(restrain)
+        self.solveDeformation(restrain, rec)
         self.solveInternalForceStress(structure, section, material, rec)
         pass
     def assembleTrigonometri(self, structure, restrain, node, rec):
@@ -255,24 +254,24 @@ class Truss():
         rec.pre.unsolvedLoadMatrix = np.array(unsolvedLoad)
         
         # Calculate final load due to settlement
-        self.unsolvedLoadMatrixWithSettlement = rec.pre.unsolvedLoadMatrix
+        rec.pre.unsolvedLoadMatrixWithSettlement = rec.pre.unsolvedLoadMatrix
         for deformation in restrain.settlement:
             n = deformation[0]-1
             dx = deformation[1]
             dy = deformation[2]
-            self.unsolvedLoadMatrixWithSettlement = \
-                self.unsolvedLoadMatrixWithSettlement \
+            rec.pre.unsolvedLoadMatrixWithSettlement = \
+                rec.pre.unsolvedLoadMatrixWithSettlement \
                 - rec.pre.globalStiffnessMatrix[n, n] * dx \
                 - rec.pre.globalStiffnessMatrix[n+1, n+1] * dy
         pass
-    def solveDeformation(self,restrain):
+    def solveDeformation(self,restrain, rec):
         '''Find deformation for each node'''
         self.nodeDeformation = np.zeros((self.totalDOF, 1))
         # Use least-square function
         # TODO: use try except to handle singular matrix using lnsqt
         
         unknownNodeDeformation = np.linalg.solve(self.unsolvedGlobalStiffnessMatrix,\
-                                                 self.unsolvedLoadMatrixWithSettlement)
+                                                 rec.pre.unsolvedLoadMatrixWithSettlement)
         self.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
         self.nodeDeformation[restrain.list] = 0
         for deformation in restrain.settlement:
