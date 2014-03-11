@@ -48,21 +48,21 @@ class Truss():
     def __init__(self):
         self.list = np.array([[]])
         pass
-    def solve2d(self, node, material, section, structure, load, restrain, rec):
+    def solve2d(self, model, rec):
         '''Solve Truss 2 dimension'''
         self.DOF = 2 # degree of freedom each node
-        self.totalNode = np.size(node.list, 0)
-        self.totalMember = np.size(structure.list, 0)
+        self.totalNode = np.size(model.node.list, 0)
+        self.totalMember = np.size(model.structure.list, 0)
         self.totalDOF = self.totalNode * self.DOF
-        self.assembleTrigonometri(structure, restrain, node, rec)
-        self.assembleLocalStiffness(structure, restrain, section, material, rec)
-        self.assembleGlobalStiffness(structure, restrain, node, rec)
-        self.assembleLoad(load, node, rec)
-        self.assembleUnsolvedMatrix(restrain, node, rec)
-        self.solveDeformation(restrain, rec)
-        self.solveInternalForceStress(structure, section, material, rec)
+        self.assembleTrigonometri(model, rec)
+        self.assembleLocalStiffness(model, rec)
+        self.assembleGlobalStiffness(model, rec)
+        self.assembleLoad(model, rec)
+        self.assembleUnsolvedMatrix(model, rec)
+        self.solveDeformation(model, rec)
+        self.solveInternalForceStress(model, rec)
         pass
-    def assembleTrigonometri(self, structure, restrain, node, rec):
+    def assembleTrigonometri(self, model, rec):
         '''Stores value of sin and cos of angle
         that is formed beetween 2 nodes for
         each element in structure.
@@ -81,6 +81,10 @@ class Truss():
                 
         '''
         # ELEMENT
+        structure = model.structure
+        node = model.node
+        restrain = model.restrain
+        
         for element in structure.list:
             if self.totalMember == 0:
                 break
@@ -125,7 +129,7 @@ class Truss():
             else:
                 rec.pre.T = np.append(rec.pre.T, [[S, C, T, length]], axis=0)
         pass
-    def assembleLocalStiffness(self, structure, restrain, section, material, rec):
+    def assembleLocalStiffness(self, model, rec):
         '''Assemble local stiffness of each element
         Local stiffness is also known as element stiffness
         '''
@@ -136,6 +140,10 @@ class Truss():
         indexLength = 3
 
         # LOCAL STIFFNESS FROM ELEMENT
+        structure = model.structure
+        section = model.section
+        material = model.material
+        restrain = model.restrain
         for element in structure.list:
             if self.totalMember == 0:
                 break
@@ -185,12 +193,13 @@ class Truss():
                                                     [matrix], axis=0)
             i = i+1
         pass
-    def assembleGlobalStiffness(self, structure, restrain, node, rec):
+    def assembleGlobalStiffness(self, model, rec):
         ''' Assemble global stiffness of structures'''
         rec.pre.globalStiffnessMatrix = np.array(np.zeros((self.totalDOF, self.totalDOF)))
         
         # ELEMENT
         i = 0
+        structure = model.structure
         for element in structure.list:
             # n1 & n2 are number of nodes for each element
             # ArrayIndexing
@@ -210,6 +219,7 @@ class Truss():
 
         # SPRING
         i = self.totalMember
+        restrain = model.restrain
         for spring in restrain.spring:
             # n is number of spring nodes 
             # ArrayIndexing
@@ -221,16 +231,17 @@ class Truss():
             rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
             i = i+1
         pass
-    def assembleLoad(self, load, node, rec):
+    def assembleLoad(self, model, rec):
         '''Assemble load matrix'''
         rec.pre.loadMatrix = np.array(np.zeros((self.totalDOF,1)))
+        load = model.load
         for load in load.list:
             node = load[0]
             Fx = load[1]
             Fy = load[2]
             rec.pre.loadMatrix[2*node-2:2*node] += [[Fx], [Fy]]
         pass
-    def assembleUnsolvedMatrix(self, restrain, node, rec):
+    def assembleUnsolvedMatrix(self, model, rec):
         '''Construct unsolved matrix.
         Unsolved matrix is consist of matrix of global stiffness of node
         which are not restrained and matrix of load at unrestrained node.
@@ -238,6 +249,7 @@ class Truss():
         # construct array number of unrestrained node
         sequence = np.arange(self.totalDOF)
         unrestrainedNode=[]
+        restrain = model.restrain
         for i in sequence:
             if i not in restrain.list:
                 unrestrainedNode += [i]
@@ -260,8 +272,9 @@ class Truss():
                 - rec.pre.globalStiffnessMatrix[n, n] * dx \
                 - rec.pre.globalStiffnessMatrix[n+1, n+1] * dy
         pass
-    def solveDeformation(self,restrain, rec):
+    def solveDeformation(self,model, rec):
         '''Find deformation for each node'''
+        restrain = model.restrain
         rec.post.nodeDeformation = np.zeros((self.totalDOF, 1))
         # Use least-square function
         # TODO: use try except to handle singular matrix using lnsqt
@@ -276,13 +289,16 @@ class Truss():
             dy = deformation[2]
             rec.post.nodeDeformation[n] =+ dx
             rec.post.nodeDeformation[n+1] += dy
-    def solveInternalForceStress(self, structure, section, material, rec):
+    def solveInternalForceStress(self, model, rec):
         '''Calculate internal force for each node'''
         # All index number below are using ArrayIndexing
         indexArea = 0
         indexYoungModulus = 2
         indexLength = 3
         i = 0
+        structure = model.structure
+        section = model.section
+        material = model.material
         for element in structure.list:
             #NormalIndexing
             n1, n2 = element[0], element[1]
