@@ -144,6 +144,8 @@ class Truss():
         section = model.section
         material = model.material
         restrain = model.restrain
+        Trig = rec.pre.T
+        
         for element in structure.list:
             if self.totalMember == 0:
                 break
@@ -153,11 +155,11 @@ class Truss():
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
-            L = rec.pre.T[i][indexLength]
+            L = Trig[i][indexLength]
             B = A * E / L
 
-            S = rec.pre.T[i][0]
-            C = rec.pre.T[i][1]
+            S = Trig[i][0]
+            C = Trig[i][1]
             
             matrix = [[C*C,   C*S, -C*C, -C*S],
                       [C*S,   S*S, -C*S, -S*S],
@@ -177,8 +179,8 @@ class Truss():
         for spring in restrain.spring:
             k = spring[1]
 
-            S = rec.pre.T[i][0]
-            C = rec.pre.T[i][1]
+            S = Trig[i][0]
+            C = Trig[i][1]
             
             matrix = [[C*C,   C*S, -C*C, -C*S],
                       [C*S,   S*S, -C*S, -S*S],
@@ -200,6 +202,7 @@ class Truss():
         # ELEMENT
         i = 0
         structure = model.structure
+        localStiffnessMatrix = rec.pre.localStiffnessMatrix
         for element in structure.list:
             # n1 & n2 are number of nodes for each element
             # ArrayIndexing
@@ -210,10 +213,10 @@ class Truss():
             a2 = 2*n1
             b1 = 2*n2-2
             b2 = 2*n2
-            rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
-            rec.pre.globalStiffnessMatrix[a1:a2, b1:b2] += rec.pre.localStiffnessMatrix[i, 0:2, 2:4]
-            rec.pre.globalStiffnessMatrix[b1:b2, a1:a2] += rec.pre.localStiffnessMatrix[i, 2:4, 0:2]
-            rec.pre.globalStiffnessMatrix[b1:b2, b1:b2] += rec.pre.localStiffnessMatrix[i, 2:4, 2:4]
+            rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += localStiffnessMatrix[i, 0:2, 0:2]
+            rec.pre.globalStiffnessMatrix[a1:a2, b1:b2] += localStiffnessMatrix[i, 0:2, 2:4]
+            rec.pre.globalStiffnessMatrix[b1:b2, a1:a2] += localStiffnessMatrix[i, 2:4, 0:2]
+            rec.pre.globalStiffnessMatrix[b1:b2, b1:b2] += localStiffnessMatrix[i, 2:4, 2:4]
             i = i+1
             pass
 
@@ -228,7 +231,7 @@ class Truss():
             #ArrayIndexing
             a1 = 2*n-2
             a2 = 2*n
-            rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += rec.pre.localStiffnessMatrix[i, 0:2, 0:2]
+            rec.pre.globalStiffnessMatrix[a1:a2, a1:a2] += localStiffnessMatrix[i, 0:2, 0:2]
             i = i+1
         pass
     def assembleLoad(self, model, rec):
@@ -253,24 +256,26 @@ class Truss():
         for i in sequence:
             if i not in restrain.list:
                 unrestrainedNode += [i]
-        self.unrestrainedNode = np.array(unrestrainedNode)
+        rec.pre.unrestrainedNode = np.array(unrestrainedNode)
 
-        unsolvedStiffness = rec.pre.globalStiffnessMatrix[np.ix_(self.unrestrainedNode, self.unrestrainedNode)]
-        unsolvedLoad = rec.pre.loadMatrix[np.ix_(self.unrestrainedNode)]
+        unsolvedStiffness = rec.pre.globalStiffnessMatrix[np.ix_(rec.pre.unrestrainedNode, rec.pre.unrestrainedNode)]
+        unsolvedLoad = rec.pre.loadMatrix[np.ix_(rec.pre.unrestrainedNode)]
 
         rec.pre.unsolvedGlobalStiffnessMatrix = np.array(unsolvedStiffness)
         rec.pre.unsolvedLoadMatrix = np.array(unsolvedLoad)
         
         # Calculate final load due to settlement
         rec.pre.unsolvedLoadMatrixWithSettlement = rec.pre.unsolvedLoadMatrix
+        unsolvedLoadMatrixWithSettlement = rec.pre.unsolvedLoadMatrixWithSettlement
+        globalStiffnessMatrix = rec.pre.globalStiffnessMatrix
         for deformation in restrain.settlement:
             n = deformation[0]-1
             dx = deformation[1]
             dy = deformation[2]
             rec.pre.unsolvedLoadMatrixWithSettlement = \
-                rec.pre.unsolvedLoadMatrixWithSettlement \
-                - rec.pre.globalStiffnessMatrix[n, n] * dx \
-                - rec.pre.globalStiffnessMatrix[n+1, n+1] * dy
+                unsolvedLoadMatrixWithSettlement \
+                - globalStiffnessMatrix[n, n] * dx \
+                - globalStiffnessMatrix[n+1, n+1] * dy
         pass
     def solveDeformation(self,model, rec):
         '''Find deformation for each node'''
@@ -281,7 +286,7 @@ class Truss():
         
         unknownNodeDeformation = np.linalg.solve(rec.pre.unsolvedGlobalStiffnessMatrix,\
                                                  rec.pre.unsolvedLoadMatrixWithSettlement)
-        rec.post.nodeDeformation[self.unrestrainedNode] = unknownNodeDeformation
+        rec.post.nodeDeformation[rec.pre.unrestrainedNode] = unknownNodeDeformation
         rec.post.nodeDeformation[restrain.list] = 0
         for deformation in restrain.settlement:
             n = deformation[0]-1
@@ -299,6 +304,8 @@ class Truss():
         structure = model.structure
         section = model.section
         material = model.material
+        Trig = rec.pre.T
+
         for element in structure.list:
             #NormalIndexing
             n1, n2 = element[0], element[1]
@@ -308,11 +315,11 @@ class Truss():
             A = section.list[numberSection, indexArea]
             typeMaterial = section.list[numberSection, indexYoungModulus]-1
             E = material.list[typeMaterial][3]
-            L = rec.pre.T[i][indexLength]
+            L = Trig[i][indexLength]
             B = E / L
 
-            S = rec.pre.T[i][0]
-            C = rec.pre.T[i][1]
+            S = Trig[i][0]
+            C = Trig[i][1]
                         
             matrix = [[C, S, 0, 0],
                       [0, 0, C, S]]
