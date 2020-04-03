@@ -4,7 +4,7 @@
 # (https://github.com/dukenmarga/openSAP32/blob/master/LICENSE.txt)
 
 import numpy as np
-import solver.mathematic as maths
+import openSAP32.solver.mathematic as maths
 
 class Truss():
     ''' Perform truss structure analysis
