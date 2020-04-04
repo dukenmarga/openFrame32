@@ -3,12 +3,12 @@
 # License: BSD 3-clause
 # (https://github.com/dukenmarga/openSAP32/blob/master/LICENSE.txt)
 
-from structure import Structure
-from material import Material
-from section import Section
-from node import Node
-from load import Load
-from restrain import Restrain
+from openSAP32.model.structure import Structure
+from openSAP32.model.material import Material
+from openSAP32.model.section import Section
+from openSAP32.model.node import Node
+from openSAP32.model.load import Load
+from openSAP32.model.restrain import Restrain
 
 
 class Model():

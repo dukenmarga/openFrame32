@@ -53,7 +53,7 @@ class Restrain:
             self.list = np.array(restrained)
         else:
             self.list = np.append(self.list, restrained, axis=0)
-    def addSettlement(self, node, (dx, dy), dimension=2):
+    def addSettlement(self, node, dx, dy, dimension=2):
         '''Add settlement to node'''
         if self.settlement.size == 0:
             self.settlement = np.array([[node, dx, dy]])

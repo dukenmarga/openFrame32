@@ -9,7 +9,7 @@ class Structure:
     '''Assembly structure'''
     def __init__(self):
         self.list = np.array([[]]);
-    def AddElement(self, (node1, node2), section):
+    def AddElement(self, node1, node2, section):
         '''Construct element an element by combining 2 nodes
 
         Example

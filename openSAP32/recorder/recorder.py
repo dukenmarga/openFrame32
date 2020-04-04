@@ -3,8 +3,8 @@
 # License: BSD 3-clause
 # (https://github.com/dukenmarga/openSAP32/blob/master/LICENSE.txt)
 
-from pre import Pre
-from post import Post
+from openSAP32.recorder.pre import Pre
+from openSAP32.recorder.post import Post
 
 class Recorder():
     def __init__(self):
