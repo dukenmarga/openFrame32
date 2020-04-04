@@ -1,14 +1,17 @@
 from distutils.core import setup
+import sys
+
+exec(open("openSAP32/_version.py").read())
 setup(
   name = 'openSAP32',
   packages = ['openSAP32'],
-  version = 0.2,
+  version = __version__,
   license='New BSD',
   description = 'openSAP32 is open source software for modeling and perform structural analysis.',
   author = 'Duken Marga',
   author_email = 'dukenmarga@gmail.com',
   url = 'https://github.com/dukenmarga/openSAP32',
-  download_url = 'https://github.com/dukenmarga/openSAP32/archive/v0.1.tar.gz',
+  #download_url = 'https://github.com/dukenmarga/openSAP32/',
   keywords = ['structural', 'analysis', 'civil','engineering','frame'],
   install_requires=[
           'numpy>=1.16',
