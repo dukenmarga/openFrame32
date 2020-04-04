@@ -128,7 +128,7 @@ class Truss():
             
             NUM_SECTION = element[self.INDEX_SECTION]-1
             A = section.list[NUM_SECTION, self.INDEX_AREA]
-            NUM_MATERIAL = section.list[NUM_SECTION, self.INDEX_MATERIAL]-1
+            NUM_MATERIAL = int(section.list[NUM_SECTION, self.INDEX_MATERIAL]-1)
             E = material.list[NUM_MATERIAL][self.INDEX_YOUNG_MODULUS]
             L = Trig[i][self.INDEX_LENGTH]
             K = A * E / L
@@ -281,7 +281,7 @@ class Truss():
             NUM_SECTION = element[self.INDEX_SECTION]-1
             
             A = section.list[NUM_SECTION, self.INDEX_AREA]
-            NUM_MATERIAL = section.list[NUM_SECTION, self.INDEX_MATERIAL]-1
+            NUM_MATERIAL = int(section.list[NUM_SECTION, self.INDEX_MATERIAL]-1)
             E = material.list[NUM_MATERIAL][self.INDEX_YOUNG_MODULUS]
             L = Trig[i][self.INDEX_LENGTH]
             K = E / L
