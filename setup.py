@@ -12,7 +12,7 @@ setup(
   license='New BSD',
   description = 'openSAP32 is open source software for modeling and perform structural analysis.',
   long_description=long_description,
-  long_description_content_type="text/markdown",
+  long_description_content_type = 'text/markdown',
   author = 'Duken Marga',
   author_email = 'dukenmarga@gmail.com',
   url = 'https://github.com/dukenmarga/openSAP32',

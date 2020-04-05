@@ -27,10 +27,8 @@ Features
 * Material:
 	* Concrete and steel material
 * Section:
-	* Area must be provided manually (there is not yet method to input dimension
-	of section)
-	* Second moment of inertia must be provided manually (there is not yet method
-	to input dimension of section)
+	* Area must be provided manually (there is not yet method to input dimension of section)
+	* Second moment of inertia must be provided manually (there is not yet method to input dimension of section)
 * Structure's response
 	* Node displacement
 	* End Element force
