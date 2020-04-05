@@ -1,4 +1,5 @@
 from setuptools import setup
+from setuptools import find_packages
 import sys
 
 with open("README.md", "r") as fh:
@@ -7,7 +8,7 @@ with open("README.md", "r") as fh:
 exec(open("openSAP32/_version.py").read())
 setup(
   name = 'openSAP32',
-  packages = ['openSAP32'],
+  packages = find_packages(),
   version = __version__,
   license='New BSD',
   description = 'openSAP32 is open source software for modeling and perform structural analysis.',
