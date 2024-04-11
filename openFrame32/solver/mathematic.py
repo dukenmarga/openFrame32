@@ -6,62 +6,62 @@
 import math
 
 
-def sin(x):
+def sin(x: float) -> float:
     return math.sin(x * math.pi / 180)
 
 
-def cos(x):
+def cos(x: float) -> float:
     return math.cos(x * math.pi / 180)
 
 
-def tan(x):
+def tan(x: float) -> float:
     return math.tan(x * math.pi / 180)
 
 
-def sec(x):
+def sec(x: float) -> float:
     return 1 / (sin(x))
 
 
-def cosec(x):
+def cosec(x: float) -> float:
     return 1 / (cos(x))
 
 
-def cotan(x):
+def cotan(x: float) -> float:
     return 1 / (tan(x))
 
 
-def S(x):
+def S(x: float) -> float:
     return sin(x)
 
 
-def C(x):
+def C(x: float) -> float:
     return cos(x)
 
 
-def T(x):
+def T(x: float) -> float:
     return tan(x)
 
 
-def SC(x):
+def SC(x: float) -> float:
     return sec(x)
 
 
-def CSC(x):
+def CSC(x: float) -> float:
     return cosec(x)
 
 
-def CT(x):
+def CT(x: float) -> float:
     return cotan(x)
 
 
-def p(x, y):
+def p(x: float, y: float) -> float:
     """return x^y
     Example:
     p(3,2) = 16"""
     return math.pow(x, y)
 
 
-def hypotenuse(a, b):
+def hypotenuse(a: float, b: float) -> float:
     """return the length of the longest side of
     right-triangle
     Example:

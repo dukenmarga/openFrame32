@@ -39,3 +39,5 @@ nosetests.xml
 Makefile
 Main.py
 example.py
+
+venv

@@ -3,7 +3,7 @@
 # License: BSD 3-clause
 # (https://github.com/dukenmarga/openFrame32/blob/master/LICENSE.txt)
 
-import Structure
+from model import Structure
 
 
 class Spring(Structure):
