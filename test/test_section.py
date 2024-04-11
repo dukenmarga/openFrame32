@@ -1,10 +1,12 @@
-from openSAP32 import Model
+from openFrame32 import Model
 
 model = Model()
 
 
 def section():
-    model.section.addSection(area=6e-4, secondInertia=0.0001333, material=1)  # section 1 using material 1
+    model.section.addSection(
+        area=6e-4, secondInertia=0.0001333, material=1
+    )  # section 1 using material 1
 
 
 section()

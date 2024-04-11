@@ -1,11 +1,12 @@
-# openSAP32
+# openFrame32
 # Copyright (c) 2014 Duken Marga Turnip
 # License: BSD 3-clause
-# (https://github.com/dukenmarga/openSAP32/blob/master/LICENSE.txt)
+# (https://github.com/dukenmarga/openFrame32/blob/master/LICENSE.txt)
 
 import numpy as np
 
-class Pre():
+
+class Pre:
     def __init__(self):
         self.T = np.array([[]])
         self.localStiffnessMatrix = np.array([[[]]])

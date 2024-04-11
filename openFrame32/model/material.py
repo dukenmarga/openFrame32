@@ -1,21 +1,25 @@
-# openSAP32
+# openFrame32
 # Copyright (c) 2014 Duken Marga Turnip
 # License: BSD 3-clause
-# (https://github.com/dukenmarga/openSAP32/blob/master/LICENSE.txt)
+# (https://github.com/dukenmarga/openFrame32/blob/master/LICENSE.txt)
 
-import numpy as np
 import math
 
+import numpy as np
+
+
 class Material:
-    ''' Define and manage properties of
-        material.
-    '''
+    """Define and manage properties of
+    material.
+    """
+
     def __init__(self):
         self.list = np.array([[]])
         pass
+
     def defineShearModulus(self, E=0, v=0):
-        ''' Calculate shear modulus
-        
+        """Calculate shear modulus
+
         Parameters
         ----------
         E : float
@@ -23,22 +27,22 @@ class Material:
             Default value is 0
         v : float
             Poisson's ratio. Default is 0
-        
+
         Return
         ------
         out : float
             Shear modulus
-        
+
         Example
         -------
         >>> material = Material()
         >>> material.defineShearModulus(200000, 0.17)
         85470.0854701
-        '''
-        return E / (2*(1+v))
-    
+        """
+        return E / (2 * (1 + v))
+
     def addMaterial(self, material, F, Fu=0, E=0, v=0):
-        ''' Add material.
+        """Add material.
 
         Parameters
         ----------
@@ -62,17 +66,17 @@ class Material:
         -------
 
         >>> material = Material()
-        >>> material.addMaterial('concrete', F=30000000) 
+        >>> material.addMaterial('concrete', F=30000000)
         >>> material.addMaterial('steel', F=400000000, Fu=600000000)
 
-        '''
+        """
         # indexMaterial is used to distinguish between material
         # indexMaterial: 1 for concrete, 2 for steel
-        if material == 'concrete':
+        if material == "concrete":
             indexMaterial = 1
             if v == 0:
                 v = 0.17
-            if E ==0:
+            if E == 0:
                 E = 4700 * math.sqrt(F)
             if Fu == 0:
                 Fu = 1.1 * F

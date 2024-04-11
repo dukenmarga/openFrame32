@@ -1,14 +1,16 @@
-from openSAP32 import Model
-import math
 import pytest
+
+from openFrame32 import Model
 
 model = Model()
 
 
 def material():
-    model.material.addMaterial('concrete', F=30000000, E=210000000)  # indexMaterial concrete = 1
-    model.material.addMaterial('steel', F=30000000)  # indexMaterial steel = 2
-    model.material.addMaterial('concrete', F=30000000)  # indexMaterial concrete = 1
+    model.material.addMaterial(
+        "concrete", F=30000000, E=210000000
+    )  # indexMaterial concrete = 1
+    model.material.addMaterial("steel", F=30000000)  # indexMaterial steel = 2
+    model.material.addMaterial("concrete", F=30000000)  # indexMaterial concrete = 1
 
 
 material()
@@ -28,8 +30,12 @@ def test_number_of_material():
 
 def test_E():
     assert model.material.list[1][3] == 200000000000  # Default values for steel
-    assert model.material.list[2][3] == pytest.approx(25742960.202742807)  # 4700*math.sqrt(30000000)
+    assert model.material.list[2][3] == pytest.approx(
+        25742960.202742807
+    )  # 4700*math.sqrt(30000000)
 
 
 def test_shear_modulus():
-    assert model.material.defineShearModulus(E=200000, v=0.17) == pytest.approx(85470.0854701)
+    assert model.material.defineShearModulus(E=200000, v=0.17) == pytest.approx(
+        85470.0854701
+    )

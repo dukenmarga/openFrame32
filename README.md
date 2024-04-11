@@ -1,6 +1,6 @@
-What is open-frame32
+What is openFrame32
 =================
-open-frame32 is an open source software for modeling and perform structural analysis.
+openFrame32 is an open source software for modeling and perform structural analysis.
 This software can be used to compute structure's response such as
 deformation and internal force.
 
