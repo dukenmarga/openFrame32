@@ -4,6 +4,7 @@
 # (https://github.com/dukenmarga/openFrame32/blob/master/LICENSE.txt)
 
 import math
+from typing import Literal
 
 import numpy as np
 
@@ -17,7 +18,7 @@ class Material:
         self.list = np.array([[]])
         pass
 
-    def defineShearModulus(self, E=0, v=0):
+    def defineShearModulus(self, E: float = 0, v: float = 0):
         """Calculate shear modulus
 
         Parameters
@@ -41,7 +42,14 @@ class Material:
         """
         return E / (2 * (1 + v))
 
-    def addMaterial(self, material, F, Fu=0, E=0, v=0):
+    def addMaterial(
+        self,
+        material: Literal["concrete", "steel"],
+        F: float,
+        Fu: float = 0,
+        E: float = 0,
+        v: float = 0,
+    ):
         """Add material.
 
         Parameters

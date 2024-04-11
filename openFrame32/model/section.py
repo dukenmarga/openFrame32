@@ -12,7 +12,7 @@ class Section:
     def __init__(self):
         self.list = np.array([[]])
 
-    def AddSection(self, area=0, secondInertia=0, material=1):
+    def AddSection(self, area: float = 0, secondInertia: float = 0, material: int = 1):
         """Add property of section
 
         Parameters

@@ -15,7 +15,7 @@ class Node:
         self.list = np.array([[]])
         pass
 
-    def addNode(self, x, y=0, z=0):
+    def addNode(self, x: int, y: int = 0, z: int = 0):
         """Add node in coordinate (x, y, z)
 
         Parameter

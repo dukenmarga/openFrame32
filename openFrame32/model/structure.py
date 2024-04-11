@@ -12,7 +12,7 @@ class Structure:
     def __init__(self):
         self.list = np.array([[]])
 
-    def AddElement(self, node1, node2, section):
+    def AddElement(self, node1: int, node2: int, section: int):
         """Construct element an element by combining 2 nodes
 
         Example

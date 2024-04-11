@@ -4,15 +4,16 @@
 # (https://github.com/dukenmarga/openFrame32/blob/master/LICENSE.txt)
 
 import numpy as np
+from numpy.typing import NDArray
 
 
 class Pre:
     def __init__(self):
-        self.T = np.array([[]])
-        self.localStiffnessMatrix = np.array([[[]]])
-        self.globalStiffnessMatrix = np.array([[]])
-        self.loadMatrix = np.array([])
-        self.unsolvedLoadMatrix = np.array([])
-        self.unsolvedLoadMatrixWithSettlement = np.array([])
-        self.unsolvedGlobalStiffnessMatrix = np.array([[[]]])
+        self.T: NDArray[np.float64] = np.array([[]])
+        self.localStiffnessMatrix: NDArray[np.float64] = np.array([[[]]])
+        self.globalStiffnessMatrix: NDArray[np.float64] = np.array([[]])
+        self.loadMatrix: NDArray[np.float64] = np.array([])
+        self.unsolvedLoadMatrix: NDArray[np.float64] = np.array([])
+        self.unsolvedLoadMatrixWithSettlement: NDArray[np.float64] = np.array([])
+        self.unsolvedGlobalStiffnessMatrix: NDArray[np.float64] = np.array([[[]]])
         pass

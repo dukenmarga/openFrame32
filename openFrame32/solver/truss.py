@@ -6,6 +6,8 @@
 import numpy as np
 
 import openFrame32.solver.mathematic as maths
+from openFrame32.model.model import Model
+from openFrame32.recorder.recorder import Recorder
 
 
 class Truss:
@@ -23,7 +25,7 @@ class Truss:
         self.list = np.array([[]])
         pass
 
-    def solve2d(self, model, rec):
+    def solve2d(self, model: Model, rec: Recorder):
         """Solve Truss 2 dimension"""
         self.INDEX_AREA = 0
         self.INDEX_YOUNG_MODULUS = 3
@@ -54,7 +56,7 @@ class Truss:
         self.solveInternalForceStress(model, rec)
         pass
 
-    def assembleTrigonometri(self, model, rec):
+    def assembleTrigonometri(self, model: Model, rec: Recorder):
         """Stores value of sin and cos of angle
         that is formed beetween 2 nodes for
         each element in structure.
@@ -124,7 +126,7 @@ class Truss:
                 rec.pre.T = np.append(rec.pre.T, [[S, C, T, length]], axis=0)
         pass
 
-    def assembleLocalStiffness(self, model, rec):
+    def assembleLocalStiffness(self, model: Model, rec: Recorder):
         """Assemble local stiffness of each element
         Local stiffness is also known as element stiffness
         """
@@ -191,7 +193,7 @@ class Truss:
             i = i + 1
         pass
 
-    def assembleGlobalStiffness(self, model, rec):
+    def assembleGlobalStiffness(self, model: Model, rec: Recorder):
         """Assemble global stiffness of structures"""
         rec.pre.globalStiffnessMatrix = np.array(
             np.zeros((self.totalDOF, self.totalDOF))
@@ -243,7 +245,7 @@ class Truss:
             i = i + 1
         pass
 
-    def assembleLoad(self, model, rec):
+    def assembleLoad(self, model: Model, rec: Recorder):
         """Assemble load matrix"""
         rec.pre.loadMatrix = np.array(np.zeros((self.totalDOF, 1)))
         load = model.load
@@ -254,14 +256,14 @@ class Truss:
             rec.pre.loadMatrix[2 * node - 2 : 2 * node] += [[Fx], [Fy]]
         pass
 
-    def assembleUnsolvedMatrix(self, model, rec):
+    def assembleUnsolvedMatrix(self, model: Model, rec: Recorder):
         """Construct unsolved matrix.
         Unsolved matrix is consist of matrix of global stiffness of node
         which are not restrained and matrix of load at unrestrained node.
         """
         # construct array number of unrestrained node
         sequence = np.arange(self.totalDOF)
-        unrestrainedNode = []
+        unrestrainedNode: list[int] = []
         restrain = model.restrain
         for i in sequence:
             if i not in restrain.list:
@@ -291,7 +293,7 @@ class Truss:
             )
         pass
 
-    def solveDeformation(self, model, rec):
+    def solveDeformation(self, model: Model, rec: Recorder):
         """Find deformation for each node"""
         restrain = model.restrain
         rec.post.nodeDeformation = np.zeros((self.totalDOF, 1))
@@ -311,7 +313,7 @@ class Truss:
             rec.post.nodeDeformation[n] = +dx
             rec.post.nodeDeformation[n + 1] += dy
 
-    def solveInternalForceStress(self, model, rec):
+    def solveInternalForceStress(self, model: Model, rec: Recorder):
         """Calculate internal force for each node"""
         i = 0
         structure = model.structure
@@ -337,7 +339,7 @@ class Truss:
             S = Trig[i][self.INDEX_SIN]
             C = Trig[i][self.INDEX_COS]
 
-            matrix = [[C, S, 0, 0], [0, 0, C, S]]
+            matrix: list[list[float]] = [[C, S, 0, 0], [0, 0, C, S]]
 
             # Stress
             s = np.dot(K, np.array([[1, -1]]))

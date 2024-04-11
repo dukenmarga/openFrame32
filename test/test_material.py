@@ -1,6 +1,6 @@
 import pytest
 
-from openFrame32 import Model
+from openFrame32.model.model import Model
 
 model = Model()
 

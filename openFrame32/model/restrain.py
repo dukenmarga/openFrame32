@@ -3,6 +3,8 @@
 # License: BSD 3-clause
 # (https://github.com/dukenmarga/openFrame32/blob/master/LICENSE.txt)
 
+from typing import Literal
+
 import numpy as np
 
 
@@ -15,7 +17,9 @@ class Restrain:
         self.spring = np.array([])
         pass
 
-    def addRestrain(self, node, restrain, dimension=2):
+    def addRestrain(
+        self, node: int, restrain: Literal["fixed", "pin", "roller"], dimension: int = 2
+    ):
         """Add restrain to node in structure
 
         Parameters
@@ -57,7 +61,7 @@ class Restrain:
         else:
             self.list = np.append(self.list, restrained, axis=0)
 
-    def addSettlement(self, node, dx, dy, dimension=2):
+    def addSettlement(self, node: int, dx: float, dy: float, dimension: int = 2):
         """Add settlement to node"""
         if self.settlement.size == 0:
             self.settlement = np.array([[node, dx, dy]])
@@ -65,7 +69,13 @@ class Restrain:
             self.settlement = np.append(self.settlement, [[node, dx, dy]], axis=0)
         pass
 
-    def addSpring(self, node, k, direction="x", dimension=2):
+    def addSpring(
+        self,
+        node: int,
+        k: float,
+        direction: Literal["x", "-x", "y", "-y"] = "x",
+        dimension: int = 2,
+    ):
         """Add spring restrain to node"""
         if direction == "x":
             angle = 180

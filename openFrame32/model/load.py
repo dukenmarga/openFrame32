@@ -13,7 +13,7 @@ class Load:
         self.list = np.array([[]])
         pass
 
-    def addLoad(self, node, Fx=0, Fy=0, Fz=0):
+    def addLoad(self, node: int, Fx: float = 0, Fy: float = 0, Fz: float = 0):
         """Add point load in node
 
         Parameters
